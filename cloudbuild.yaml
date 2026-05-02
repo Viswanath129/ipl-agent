@@ -1,0 +1,32 @@
+# Google Cloud Build configuration (optional — deploy.bat handles this)
+# Use this if you want to set up automatic builds on git push via Cloud Build triggers
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/ipl-influence-engine', '.']
+
+  # Push to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ipl-influence-engine']
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ipl-influence-engine'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/ipl-influence-engine'
+      - '--region'
+      - 'asia-south1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '1Gi'
+
+images:
+  - 'gcr.io/$PROJECT_ID/ipl-influence-engine'
