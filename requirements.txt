@@ -7,4 +7,6 @@ plotly
 python-dotenv
 pydantic
 google-generativeai
+google-adk
 requests
+sqlalchemy

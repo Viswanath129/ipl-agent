@@ -5,9 +5,16 @@ REM =====================================================
 REM  IPL INFLUENCE ENGINE — One-Command Cloud Run Deploy
 REM  Edit these 3 variables once, then never touch again
 REM =====================================================
+REM =====================================================
+REM  CONFIGURE THESE 3 VARIABLES
+REM =====================================================
 set PROJECT_ID=YOUR_GCP_PROJECT_ID
 set SERVICE_NAME=ipl-influence-engine
 set REGION=asia-south1
+
+REM Optional: Set your Gemini API key here or in .env
+set GEMINI_API_KEY=%GEMINI_API_KEY%
+set API_KEY=%API_KEY%
 
 REM Derived values
 set IMAGE=gcr.io/%PROJECT_ID%/%SERVICE_NAME%
@@ -79,7 +86,7 @@ gcloud run deploy %SERVICE_NAME% ^
     --cpu 1 ^
     --min-instances 0 ^
     --max-instances 3 ^
-    --set-env-vars "GEMINI_API_KEY=YOUR_GEMINI_KEY_HERE" ^
+    --set-env-vars "GEMINI_API_KEY=%GEMINI_API_KEY%,API_KEY=%API_KEY%" ^
     --project %PROJECT_ID%
 
 if !errorlevel! neq 0 (

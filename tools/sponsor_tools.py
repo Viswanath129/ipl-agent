@@ -1,26 +1,62 @@
-from data.mock_db import get_mock_sponsor_data
+from data.database import Brand, SponsorMetric, get_session, init_db
 
-def calculate_roi(brand_name: str, spend: float) -> dict:
+
+def sponsor_roi_tool(brand: str, team: str = "Overall") -> dict:
     """
-    Calculates the ROI, visibility score, and engagement metrics for an IPL sponsor.
-    
+    Estimate sponsor visibility and ROI for an IPL brand.
+
     Args:
-        brand_name (str): The name of the brand/sponsor (e.g., 'Dream11').
-        spend (float): The total spend by the sponsor in INR crores.
-    
+        brand: Sponsor brand name, for example Dream11, CEAT, or Puma.
+        team: Optional IPL team or matchup context.
+
     Returns:
-        dict: A dictionary containing visibility, sentiment, mentions, and ROI.
+        dict: Sponsor ROI, visibility, social, sentiment, and recommendation fields.
     """
-    data = get_mock_sponsor_data(brand_name)
-    multiplier = spend / 10 if spend > 0 else 1
-    
+    init_db()
+    normalized_brand = brand.strip() or "Dream11"
+
+    with get_session() as session:
+        record = (
+            session.query(SponsorMetric)
+            .join(Brand)
+            .filter(Brand.name.ilike(normalized_brand))
+            .order_by(SponsorMetric.id.desc())
+            .first()
+        )
+
+        if record is None:
+            return {
+                "brand_name": normalized_brand,
+                "team_context": team,
+                "visibility_score": 0,
+                "social_mentions": 0,
+                "sentiment": "unknown",
+                "estimated_roi": "unknown",
+                "best_player_association": "unknown",
+                "best_content_channel": "unknown",
+                "recommendation": "No sponsor data found. Add real campaign metrics before presenting this as ROI intelligence.",
+                "data_source": "sqlite",
+            }
+
+        brand_name = record.brand.name
+        return {
+            "brand_name": brand_name,
+            "team_context": team,
+            "visibility_score": round(record.visibility_score, 2),
+            "social_mentions": record.social_mentions,
+            "sentiment": record.sentiment,
+            "estimated_roi": f"{record.estimated_roi_pct:.0f}%",
+            "best_player_association": record.best_player_association,
+            "best_content_channel": record.best_content_channel,
+            "recommendation": record.recommendation,
+            "data_source": "sqlite",
+        }
+
+
+def calculate_roi(brand_name: str, spend: float = 50) -> dict:
+    """Backward-compatible wrapper for older callers."""
+    result = sponsor_roi_tool(brand=brand_name)
+    result["assumed_spend_crore"] = spend
     return {
-        "brand_name": brand_name,
-        "visibility_score": min(100, int(data["visibility_score"] * multiplier)),
-        "social_mentions": int(data["social_mentions"] * multiplier),
-        "sentiment": data["sentiment"],
-        "estimated_roi": data["roi"],
-        "best_player_association": data["player"],
-        "best_content_channel": data["channel"],
-        "recommendation": data["rec"]
+        **result,
     }

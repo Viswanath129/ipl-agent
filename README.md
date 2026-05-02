@@ -1,86 +1,64 @@
-# ⚡ IPL Influence Engine
+<div align="center">
+  <img src="assets/logo.png" alt="IPL Influence Engine Logo" width="200">
+  <h1>IPL Influence Engine</h1>
+  <p>AI-powered IPL sponsor intelligence simulator and debate engagement platform</p>
+</div>
 
-**AI-Powered IPL Sponsor ROI Analytics & Viral Debate Generator**
+This project now uses a real Google ADK entrypoint when `google-adk` is installed, with deterministic FastAPI fallbacks so the app still works when local ADK dependencies are unavailable.
 
-Built with Google ADK, FastAPI, Streamlit, and deployed on Google Cloud Run.
+## What Works
 
-## Architecture
-
-```
-User → Streamlit Dashboard (port 8080) → FastAPI Backend (port 8000)
-                                              ↓
-                                    Master Orchestrator Agent
-                                       ↙              ↘
-                              Module A                Module B
-                          (Sponsor ROI)           (Debate Engine)
-```
+- FastAPI chat endpoint with validation, optional API key auth, and basic rate limiting
+- Real `google.adk.agents.Agent` imports in `agent.py` / `agents/agent.py`
+- Deterministic query classifier for sponsor, debate, mixed, and general routes
+- Callable Python tools for sponsor ROI and IPL debate generation
+- SQLite-backed sponsor metrics and query logs through SQLAlchemy
+- Streamlit UI with four real tabs: Ask AI, Sponsor ROI, Debate Arena, Reports
+- Docker healthcheck that does not require curl
 
 ## Local Development
 
 ```bash
-# Create virtual environment
 python -m venv venv
-venv\Scripts\activate        # Windows
-source venv/bin/activate     # Mac/Linux
-
-# Install dependencies
+venv\Scripts\activate
 pip install -r requirements.txt
-
-# Set environment variables
 copy .env.example .env
-# Edit .env with your GEMINI_API_KEY
 
-# Run both servers
-# Terminal 1: FastAPI
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
-# Terminal 2: Streamlit
 streamlit run ui/app.py --server.port 8080
 ```
 
-## Deploy to Google Cloud Run
+Set `API_KEY` in `.env` to require `X-API-Key` for API calls. Leave it unset only for local demos.
 
-### One-time setup:
-1. Install [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
-2. Run `gcloud auth login`
-3. Edit `deploy.bat` — set your `PROJECT_ID` and `GEMINI_API_KEY`
+## ADK Entrypoint
 
-### Every deploy:
+```text
+agent.py              # exports root_agent
+agents/agent.py       # defines root_agent with real google.adk Agent
+tools/                # ADK-callable Python tools
 ```
-deploy.bat
-```
-
-That's it. Your app goes live.
 
 ## Project Structure
 
-```
+```text
 ipl_influence_engine/
-├── main.py                  # FastAPI backend
-├── start.sh                 # Multi-process startup for Cloud Run
-├── Dockerfile               # Cloud Run container config
-├── deploy.bat               # One-command deploy script
-├── cloudbuild.yaml           # Optional CI/CD config
-├── requirements.txt
-├── .gitignore
-├── .dockerignore
-├── .env.example
+├── agent.py
+├── main.py
 ├── agents/
-│   ├── orchestrator.py      # Master Orchestrator (routes queries)
-│   ├── module_a_sponsor_roi.py  # Sponsor ROI Agent
-│   └── module_b_debate.py   # Debate Engine Agent
-├── tools/
-│   ├── sponsor_tools.py     # ROI calculation tools
-│   └── debate_tools.py      # Player stats & bias detection
-├── data/
-│   └── mock_db.py           # Mock database
-├── google_adk/              # Local ADK shim
 │   ├── agent.py
-│   └── tools.py
+│   ├── orchestrator.py
+│   ├── module_a_sponsor_roi.py
+│   └── module_b_debate.py
+├── tools/
+│   ├── sponsor_tools.py
+│   └── debate_tools.py
+├── data/
+│   ├── database.py
+│   └── mock_db.py
 └── ui/
-    └── app.py               # Streamlit dashboard
+    └── app.py
 ```
 
-## License
+## Reality Check
 
-MIT
+The product is still a simulator until connected to real sponsor spend, match exposure, social, and sentiment feeds. Do not sell current outputs as live ROI analytics.
