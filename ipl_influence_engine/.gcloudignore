@@ -44,6 +44,7 @@ frontend/
 # Misc
 *.bat
 *.sh
+!start.sh
 db/
 assets/
 tests/

@@ -16,6 +16,7 @@ import {
   PieChart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { apiClient } from './api/client';
 
 // --- Types ---
 interface DashboardData {
@@ -47,7 +48,7 @@ const App: React.FC = () => {
   const [debateTopic, setDebateTopic] = useState('Dhoni vs Rohit as IPL captain');
   const [debateResult, setDebateResult] = useState<any>(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 
   const handleChat = async (e?: React.FormEvent, customQuery?: string) => {
     if (e) e.preventDefault();
@@ -57,12 +58,7 @@ const App: React.FC = () => {
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: finalQuery }),
-      });
-      const data = await res.json();
+      const data = await apiClient.post('/api/chat', { query: finalQuery });
       setResult(data.data);
     } catch (err) {
       console.error('API Error:', err);
@@ -74,12 +70,7 @@ const App: React.FC = () => {
   const handleSponsorROI = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/sponsors/roi`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brand: selectedBrand, match: matchContext }),
-      });
-      const data = await res.json();
+      const data = await apiClient.post('/api/sponsors/roi', { brand: selectedBrand, match: matchContext });
       setRoiResult(data.data);
     } catch (err) {
       console.error('ROI Error:', err);
@@ -91,12 +82,7 @@ const App: React.FC = () => {
   const handleDebate = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/debates`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: debateTopic }),
-      });
-      const data = await res.json();
+      const data = await apiClient.post('/api/debates', { topic: debateTopic });
       setDebateResult(data.data);
     } catch (err) {
       console.error('Debate Error:', err);
@@ -108,12 +94,7 @@ const App: React.FC = () => {
   const handleVote = async (side: string) => {
     if (!debateResult) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/debates/vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ debate_id: debateResult.debate_id, side }),
-      });
-      const data = await res.json();
+      const data = await apiClient.post('/api/debates/vote', { debate_id: debateResult.debate_id, side });
       setDebateResult({ ...debateResult, fan_voting: data.data });
     } catch (err) {
       console.error('Vote Error:', err);
@@ -122,8 +103,7 @@ const App: React.FC = () => {
 
   const fetchSummary = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/summary`);
-      const data = await res.json();
+      const data = await apiClient.get('/api/reports/summary');
       setSummary(data.data);
     } catch (err) {
       console.error('Summary Error:', err);
