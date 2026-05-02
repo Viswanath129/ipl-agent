@@ -1,6 +1,7 @@
 from agents.module_a_sponsor_roi import run_sponsor_agent
 from agents.module_b_debate import run_debate_agent
 from data.database import log_query
+from utils.cache import cache_response, get_cached_response
 
 
 def classify_query(q: str) -> str:
@@ -21,11 +22,21 @@ def classify_query(q: str) -> str:
     return "general"
 
 
-def handle_query(query: str) -> dict:
-    """Orchestrates query routing between sub-agents."""
+def handle_query(query: str, skip_cache: bool = False) -> dict:
+    """
+    Orchestrates query routing between sub-agents.
+    Uses caching to reduce Gemini API costs (60 min TTL).
+    """
     route = classify_query(query)
     log_query(query, route)
-    result = {"route_taken": route, "query": query}
+
+    # Check cache first (cost optimization)
+    if not skip_cache:
+        cached = get_cached_response(query, route, ttl_minutes=60)
+        if cached:
+            return {"route_taken": route, "query": query, "cached": True, **cached}
+
+    result = {"route_taken": route, "query": query, "cached": False}
 
     if route == "sponsor":
         result["module_a_output"] = run_sponsor_agent(query)
@@ -36,5 +47,8 @@ def handle_query(query: str) -> dict:
         result["module_b_output"] = run_debate_agent(query)
     else:
         result["message"] = "Ask about IPL sponsor ROI, brand visibility, or player/team debates."
+
+    # Cache the result (cost optimization)
+    cache_response(query, route, result)
 
     return result

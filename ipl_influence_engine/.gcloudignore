@@ -1,0 +1,49 @@
+# This file specifies files that are *not* uploaded to Google Cloud Platform
+# using gcloud. It follows the same syntax as .gitignore.
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local data (will be recreated in container)
+*.db-journal
+
+# Documentation
+*.md
+DEPLOY_GUIDE.md
+
+# Streamlit (not needed for API-only deploy)
+ui/
+.streamlit/
+
+# Frontend (separate deploy)
+frontend/
+
+# Misc
+*.bat
+*.sh
+db/
+assets/
+tests/

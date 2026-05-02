@@ -11,7 +11,6 @@ import {
   Send,
   Zap,
   ChevronRight,
-  Download,
   Vote,
   Trophy,
   PieChart

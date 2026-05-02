@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from agents.orchestrator import handle_query
 from data.database import get_report_summary, init_db
+from utils.cache import init_cache
 from dotenv import load_dotenv
 import uvicorn
 from services.debate_engine import debate_history, judge_debate, vote_debate
@@ -19,17 +20,22 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    init_cache()
     yield
 
 
 app = FastAPI(title="IPL Influence Engine API", version="1.0.0", lifespan=lifespan)
-allowed_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",") if origin.strip()]
+allowed_origins = [
+    origin.strip() 
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,https://gdgbzw.web.app").split(",") 
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "X-API-Key"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 RATE_LIMIT_WINDOW_SECONDS = 60
 RATE_LIMIT_MAX_REQUESTS = 30
@@ -150,6 +156,16 @@ def debate_vote(req: VoteRequest, request: Request, x_api_key: str | None = Head
     enforce_api_key(x_api_key)
     enforce_rate_limit(request.client.host if request.client else "unknown")
     return {"success": True, "data": vote_debate(req.debate_id, req.side)}
+
+
+# Cost monitoring endpoint
+@app.get("/api/cache/stats")
+def cache_stats(request: Request, x_api_key: str | None = Header(default=None)):
+    """Get cache statistics for cost monitoring."""
+    enforce_api_key(x_api_key)
+    from utils.cache import get_cache_stats
+    return {"success": True, "data": get_cache_stats()}
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
