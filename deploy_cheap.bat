@@ -79,7 +79,8 @@ gcloud run deploy %SERVICE_NAME% ^
     --cpu=1 ^
     --concurrency=80 ^
     --timeout=300 ^
-    --no-cpu-boost ^^    --allow-unauthenticated ^
+    --no-cpu-boost ^
+    --allow-unauthenticated ^
     --set-env-vars="GEMINI_API_KEY=%GEMINI_API_KEY%,API_KEY=%API_KEY%,CORS_ORIGINS=%FRONTEND_URL%,DB_URL=sqlite:///./ipl_data.db" ^
     --set-env-vars="PYTHONUNBUFFERED=1" ^
     --quiet

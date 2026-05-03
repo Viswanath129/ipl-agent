@@ -13,10 +13,12 @@ import {
   ChevronRight,
   Vote,
   Trophy,
-  PieChart
+  PieChart,
+  Shirt
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiClient } from './api/client';
+import JerseyEngine from './components/JerseyEngine';
 
 // --- Types ---
 interface DashboardData {
@@ -32,7 +34,7 @@ interface SummaryData {
 }
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('Ask AI');
+  const [activeTab, setActiveTab] = useState('3D Jersey');
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DashboardData | null>(null);
@@ -115,6 +117,7 @@ const App: React.FC = () => {
   }, [activeTab]);
 
   const tabs = [
+    { name: '3D Jersey', icon: <Shirt size={20} /> },
     { name: 'Ask AI', icon: <MessageSquare size={20} /> },
     { name: 'Sponsor ROI', icon: <TrendingUp size={20} /> },
     { name: 'Debate Arena', icon: <Swords size={20} /> },
@@ -176,6 +179,12 @@ const App: React.FC = () => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
           >
+            {activeTab === '3D Jersey' && (
+              <div className="max-w-7xl mx-auto">
+                <JerseyEngine />
+              </div>
+            )}
+
             {activeTab === 'Ask AI' && (
               <div className="max-w-4xl mx-auto space-y-6">
                 <div className="premium-card">
