@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   RotateCw, Eye, EyeOff, Flame, Upload, GitCompare, Play, Pause,
   ChevronRight, Zap, Trophy, Target, TrendingUp, Shield, Star,
-  ArrowRight, X, Camera, Users, Radio
+  ArrowRight, X, Camera, Users, Radio, Image as ImageIcon
 } from 'lucide-react';
 import Jersey3DViewer from './Jersey3D';
 import { teams, matchPhases } from '../data/teamData';
@@ -258,6 +258,57 @@ function LogoUploader({ team, onClose }: { team: TeamData; onClose: () => void }
   );
 }
 
+// ─── Premium Jersey Gallery ───
+function JerseyGallery({ team, onClose }: { team: TeamData; onClose: () => void }) {
+  const [view, setView] = useState<'front' | 'back'>('front');
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+      className="premium-card relative overflow-hidden" style={{ minHeight: '600px' }}>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h3 className="text-2xl font-bold flex items-center gap-2 text-white">
+            <ImageIcon size={24} className="text-primary" /> Premium 8K Render Preview
+          </h3>
+          <p className="text-slate-400 text-sm mt-1">AI-generated high-fidelity visualization using Gemini Nano style</p>
+        </div>
+        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg text-slate-400"><X size={20} /></button>
+      </div>
+
+      <div className="flex justify-center gap-4 mb-8">
+        <button onClick={() => setView('front')}
+          className={`px-6 py-2 rounded-xl font-bold transition-all ${view === 'front' ? 'bg-primary text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}>
+          Front View
+        </button>
+        <button onClick={() => setView('back')}
+          className={`px-6 py-2 rounded-xl font-bold transition-all ${view === 'back' ? 'bg-primary text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}>
+          Back View
+        </button>
+      </div>
+
+      <div className="relative group">
+        <motion.div key={view} initial={{ opacity: 0, x: view === 'front' ? -20 : 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
+          className="w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-black/40">
+          <img src={view === 'front' ? team.frontImage : team.backImage}
+            alt={`${team.name} ${view} view`}
+            className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-700" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+        </motion.div>
+        <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-xs text-slate-400 uppercase tracking-widest font-bold">Jersey DNA</div>
+              <div className="text-lg font-bold text-white">{team.name} — {view.toUpperCase()}</div>
+            </div>
+            <div className="px-3 py-1 rounded-lg bg-primary/20 text-primary text-xs font-bold border border-primary/30">
+              HD PREVIEW
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Stats Bar ───
 function StatsBar({ team }: { team: TeamData }) {
   const stats = [
@@ -294,6 +345,7 @@ export default function JerseyEngine() {
   const [showCompare, setShowCompare] = useState(false);
   const [showMatchMode, setShowMatchMode] = useState(false);
   const [showLogoUpload, setShowLogoUpload] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
 
   const team = teams.find(t => t.id === selectedTeamId)!;
 
@@ -329,8 +381,11 @@ export default function JerseyEngine() {
           <button onClick={() => { setShowMatchMode(!showMatchMode); setShowCompare(false); setShowLogoUpload(false); }} className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all">
             <Play size={14} />Match Mode
           </button>
-          <button onClick={() => { setShowLogoUpload(!showLogoUpload); setShowCompare(false); setShowMatchMode(false); }} className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all">
+          <button onClick={() => { setShowLogoUpload(!showLogoUpload); setShowCompare(false); setShowMatchMode(false); setShowGallery(false); }} className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all">
             <Upload size={14} />Upload Logo
+          </button>
+          <button onClick={() => { setShowGallery(!showGallery); setShowCompare(false); setShowMatchMode(false); setShowLogoUpload(false); }} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${showGallery ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'}`}>
+            <ImageIcon size={14} />HD Gallery
           </button>
         </div>
       </div>
@@ -377,6 +432,7 @@ export default function JerseyEngine() {
         {showCompare && <ComparePanel teams={teams} onClose={() => setShowCompare(false)} />}
         {showMatchMode && <MatchSimulator team={team} onClose={() => setShowMatchMode(false)} />}
         {showLogoUpload && <LogoUploader team={team} onClose={() => setShowLogoUpload(false)} />}
+        {showGallery && <JerseyGallery team={team} onClose={() => setShowGallery(false)} />}
       </AnimatePresence>
     </div>
   );

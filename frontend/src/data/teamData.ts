@@ -24,6 +24,8 @@ export interface TeamData {
   sponsors: SponsorZone[];
   totalSponsorValue: string;
   brandScore: number;
+  frontImage: string;
+  backImage: string;
 }
 
 export const teams: TeamData[] = [
@@ -39,6 +41,8 @@ export const teams: TeamData[] = [
     neonGlow: '#FFC107',
     totalSponsorValue: '₹158 Cr',
     brandScore: 96,
+    frontImage: '/assets/jerseys/front/csk.png',
+    backImage: '/assets/jerseys/back/csk.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'India Cements', visibility_score: 95, estimated_value: '₹45 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#FFC107' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Myntra', visibility_score: 88, estimated_value: '₹32 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#FF6B6B' },
@@ -61,6 +65,8 @@ export const teams: TeamData[] = [
     neonGlow: '#2196F3',
     totalSponsorValue: '₹172 Cr',
     brandScore: 98,
+    frontImage: '/assets/jerseys/front/mi.png',
+    backImage: '/assets/jerseys/back/mi.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'Marriott Bonvoy', visibility_score: 96, estimated_value: '₹48 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#D4AF37' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Samsung', visibility_score: 90, estimated_value: '₹35 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#1428A0' },
@@ -83,6 +89,8 @@ export const teams: TeamData[] = [
     neonGlow: '#FF1744',
     totalSponsorValue: '₹162 Cr',
     brandScore: 97,
+    frontImage: '/assets/jerseys/front/rcb.png',
+    backImage: '/assets/jerseys/back/rcb.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'Muthoot Fincorp', visibility_score: 94, estimated_value: '₹42 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#D4AF37' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Puma', visibility_score: 92, estimated_value: '₹38 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#EC1C24' },
@@ -105,6 +113,8 @@ export const teams: TeamData[] = [
     neonGlow: '#CE93D8',
     totalSponsorValue: '₹140 Cr',
     brandScore: 92,
+    frontImage: '/assets/jerseys/front/kkr.png',
+    backImage: '/assets/jerseys/back/kkr.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'Lux Cozi', visibility_score: 93, estimated_value: '₹38 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#D4AF37' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'My11Circle', visibility_score: 86, estimated_value: '₹30 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#FF6B6B' },
@@ -127,6 +137,8 @@ export const teams: TeamData[] = [
     neonGlow: '#FF9800',
     totalSponsorValue: '₹128 Cr',
     brandScore: 88,
+    frontImage: '/assets/jerseys/front/srh.png',
+    backImage: '/assets/jerseys/back/srh.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'JK Lakshmi Cement', visibility_score: 91, estimated_value: '₹35 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#FF822A' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Adidas', visibility_score: 85, estimated_value: '₹28 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#000000' },
@@ -149,6 +161,8 @@ export const teams: TeamData[] = [
     neonGlow: '#FF4081',
     totalSponsorValue: '₹132 Cr',
     brandScore: 89,
+    frontImage: '/assets/jerseys/front/rr.png',
+    backImage: '/assets/jerseys/back/rr.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'Red Bull', visibility_score: 94, estimated_value: '₹40 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#EA1A85' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Adidas', visibility_score: 87, estimated_value: '₹30 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#254AA5' },
@@ -171,6 +185,8 @@ export const teams: TeamData[] = [
     neonGlow: '#D4AF37',
     totalSponsorValue: '₹136 Cr',
     brandScore: 90,
+    frontImage: '/assets/jerseys/front/gt.png',
+    backImage: '/assets/jerseys/back/gt.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'Navi', visibility_score: 92, estimated_value: '₹36 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#D4AF37' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Adidas', visibility_score: 88, estimated_value: '₹32 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#1C1C2B' },
@@ -193,6 +209,8 @@ export const teams: TeamData[] = [
     neonGlow: '#FF1744',
     totalSponsorValue: '₹118 Cr',
     brandScore: 85,
+    frontImage: '/assets/jerseys/front/pbks.png',
+    backImage: '/assets/jerseys/back/pbks.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'EbixCash', visibility_score: 89, estimated_value: '₹32 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#ED1B24' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Nike', visibility_score: 84, estimated_value: '₹26 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#A7A9AC' },
@@ -215,6 +233,8 @@ export const teams: TeamData[] = [
     neonGlow: '#42A5F5',
     totalSponsorValue: '₹142 Cr',
     brandScore: 91,
+    frontImage: '/assets/jerseys/front/dc.png',
+    backImage: '/assets/jerseys/back/dc.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'JSW', visibility_score: 93, estimated_value: '₹40 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#004C93' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Adidas', visibility_score: 87, estimated_value: '₹30 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#EF1B23' },
@@ -237,6 +257,8 @@ export const teams: TeamData[] = [
     neonGlow: '#FF4081',
     totalSponsorValue: '₹125 Cr',
     brandScore: 87,
+    frontImage: '/assets/jerseys/front/lsg.png',
+    backImage: '/assets/jerseys/back/lsg.png',
     sponsors: [
       { zone: 'front_chest', label: 'Front Chest', sponsor: 'My11Circle', visibility_score: 90, estimated_value: '₹34 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#A72056' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Nike', visibility_score: 85, estimated_value: '₹28 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#FFCC00' },
