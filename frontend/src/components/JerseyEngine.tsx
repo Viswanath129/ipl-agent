@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   RotateCw, Eye, EyeOff, Flame, Upload, GitCompare, Play, Pause,
   ChevronRight, Zap, Trophy, Target, TrendingUp, Shield, Star,
-  ArrowRight, X, Camera, Users, Radio, Image as ImageIcon
+  ArrowRight, X, Camera, Users, Radio, Image as ImageIcon,
+  MousePointer2, Sparkles, LayoutGrid, Layers
 } from 'lucide-react';
 import Jersey3DViewer from './Jersey3D';
 import { teams, matchPhases } from '../data/teamData';
@@ -13,12 +14,11 @@ import type { TeamData, SponsorZone, MatchPhase } from '../data/teamData';
 function ROIPanel({ zone, onClose }: { zone: SponsorZone; onClose: () => void }) {
   const exposureColor = zone.camera_exposure === 'very high' ? '#22c55e' : zone.camera_exposure === 'high' ? '#3b82f6' : zone.camera_exposure === 'medium' ? '#f59e0b' : '#ef4444';
   return (
-    <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 30 }}
-      className="absolute top-4 right-4 z-20 w-80"
-      style={{ background: 'rgba(10,10,30,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '24px' }}>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2"><Target size={18} className="text-primary" />{zone.label}</h3>
-        <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-lg"><X size={16} /></button>
+    <motion.div initial={{ opacity: 0, scale: 0.9, x: 20 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9, x: 20 }}
+      className="absolute top-8 right-8 z-20 w-80 premium-card p-6 border-white/20 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-bold flex items-center gap-2 text-white"><Target size={18} className="text-primary" />{zone.label}</h3>
+        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-xl transition-colors"><X size={18} /></button>
       </div>
       <div className="space-y-3">
         <div className="flex justify-between items-center p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -55,20 +55,23 @@ function ROIPanel({ zone, onClose }: { zone: SponsorZone; onClose: () => void })
 // ─── Team Selector Carousel ───
 function TeamSelector({ teams: teamList, selected, onSelect }: { teams: TeamData[]; selected: string; onSelect: (id: string) => void }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 px-1" style={{ scrollbarWidth: 'none' }}>
-      {teamList.map((t) => (
-        <button key={t.id} onClick={() => onSelect(t.id)}
-          className="flex-shrink-0 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300"
-          style={{
-            background: selected === t.id ? t.primaryColor : 'rgba(255,255,255,0.05)',
-            color: selected === t.id ? t.textColor : '#94a3b8',
-            border: `1px solid ${selected === t.id ? t.primaryColor : 'rgba(255,255,255,0.08)'}`,
-            boxShadow: selected === t.id ? `0 0 20px ${t.primaryColor}40` : 'none',
-            transform: selected === t.id ? 'scale(1.05)' : 'scale(1)',
-          }}>
-          {t.shortName}
-        </button>
-      ))}
+    <div className="flex gap-3 overflow-x-auto pb-4 px-1 no-scrollbar items-center">
+      <div className="p-1 glass rounded-2xl flex gap-1 items-center">
+        {teamList.map((t) => (
+          <button key={t.id} onClick={() => onSelect(t.id)}
+            className={`flex-shrink-0 px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all duration-500 relative overflow-hidden group ${selected === t.id ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+            style={{
+              background: selected === t.id ? t.primaryColor : 'transparent',
+              boxShadow: selected === t.id ? `0 8px 20px ${t.primaryColor}40` : 'none',
+              color: selected === t.id ? t.textColor : undefined
+            }}>
+            {selected === t.id && (
+              <motion.div layoutId="active-team" className="absolute inset-0 z-0 bg-white/10" />
+            )}
+            <span className="relative z-10">{t.shortName}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -356,7 +359,7 @@ export default function JerseyEngine() {
   }, []);
 
   return (
-    <div className="space-y-6">
+<div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
@@ -368,24 +371,24 @@ export default function JerseyEngine() {
           </h2>
           <p className="text-slate-400 mt-1">Interactive sponsor zone analytics for all 10 IPL teams</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setAutoSpin(!autoSpin)} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${autoSpin ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-white/5 text-slate-400 border border-white/10'}`}>
-            <RotateCw size={14} />{autoSpin ? 'Spinning' : 'Spin'}
+        <div className="flex gap-3 flex-wrap">
+          <button onClick={() => setAutoSpin(!autoSpin)} className={`btn-glass ${autoSpin && 'bg-primary/20 border-primary/30 text-primary'}`}>
+            <RotateCw size={16} className={autoSpin ? 'animate-spin' : ''} /> {autoSpin ? 'Spinning' : 'Spin'}
           </button>
-          <button onClick={() => setShowHeatmap(!showHeatmap)} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${showHeatmap ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-white/5 text-slate-400 border border-white/10'}`}>
-            <Flame size={14} />Heatmap
+          <button onClick={() => setShowHeatmap(!showHeatmap)} className={`btn-glass ${showHeatmap && 'bg-secondary/20 border-secondary/30 text-secondary'}`}>
+            <Flame size={16} /> Heatmap
           </button>
-          <button onClick={() => { setShowCompare(!showCompare); setShowMatchMode(false); setShowLogoUpload(false); }} className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all">
-            <GitCompare size={14} />Compare
+          <button onClick={() => { setShowCompare(!showCompare); setShowMatchMode(false); setShowLogoUpload(false); setShowGallery(false); }} className={`btn-glass ${showCompare && 'bg-blue-500/20 border-blue-500/30 text-blue-400'}`}>
+            <GitCompare size={16} /> Compare
           </button>
-          <button onClick={() => { setShowMatchMode(!showMatchMode); setShowCompare(false); setShowLogoUpload(false); }} className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all">
-            <Play size={14} />Match Mode
+          <button onClick={() => { setShowMatchMode(!showMatchMode); setShowCompare(false); setShowLogoUpload(false); setShowGallery(false); }} className={`btn-glass ${showMatchMode && 'bg-accent/20 border-accent/30 text-accent'}`}>
+            <Play size={16} /> Match Simulation
           </button>
-          <button onClick={() => { setShowLogoUpload(!showLogoUpload); setShowCompare(false); setShowMatchMode(false); setShowGallery(false); }} className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all">
-            <Upload size={14} />Upload Logo
+          <button onClick={() => { setShowLogoUpload(!showLogoUpload); setShowCompare(false); setShowMatchMode(false); setShowGallery(false); }} className={`btn-glass ${showLogoUpload && 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'}`}>
+            <Upload size={16} /> Upload Logo
           </button>
-          <button onClick={() => { setShowGallery(!showGallery); setShowCompare(false); setShowMatchMode(false); setShowLogoUpload(false); }} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${showGallery ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'}`}>
-            <ImageIcon size={14} />HD Gallery
+          <button onClick={() => { setShowGallery(!showGallery); setShowCompare(false); setShowMatchMode(false); setShowLogoUpload(false); }} className={`btn-primary ${showGallery && 'scale-110 shadow-primary/40'}`}>
+            <ImageIcon size={16} /> Premium 8K Previews
           </button>
         </div>
       </div>

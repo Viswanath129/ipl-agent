@@ -7,7 +7,10 @@ import {
   MeshTransmissionMaterial,
   Text,
   Html,
-  Sparkles
+  Sparkles,
+  MeshReflectorMaterial,
+  ContactShadows,
+  Stage
 } from '@react-three/drei';
 import * as THREE from 'three';
 import type { TeamData, SponsorZone } from '../data/teamData';
@@ -165,6 +168,14 @@ function JerseyBody({ team, activeZone, onZoneClick, showHeatmap }: Omit<JerseyP
 
         return (
           <group key={sponsor.zone}>
+            {/* Holographic Ring Glow */}
+            <mesh
+              position={zoneConfig.pos}
+              rotation={zoneConfig.rotation || [0, 0, 0]}
+            >
+              <ringGeometry args={[0.08, 0.1, 32]} />
+              <meshBasicMaterial color={sponsor.color} transparent opacity={isActive ? 0.8 : 0.3} />
+            </mesh>
             <mesh
               position={zoneConfig.pos}
               rotation={zoneConfig.rotation || [0, 0, 0]}
@@ -179,9 +190,9 @@ function JerseyBody({ team, activeZone, onZoneClick, showHeatmap }: Omit<JerseyP
               <meshPhysicalMaterial
                 color={showHeatmap ? heatColor : new THREE.Color(sponsor.color)}
                 transparent
-                opacity={isActive ? 0.85 : showHeatmap ? 0.6 : 0.25}
+                opacity={isActive ? 0.4 : showHeatmap ? 0.6 : 0.1}
                 emissive={showHeatmap ? heatColor : new THREE.Color(sponsor.color)}
-                emissiveIntensity={isActive ? 1.5 : showHeatmap ? 0.8 : 0.2}
+                emissiveIntensity={isActive ? 2 : showHeatmap ? 0.8 : 0.2}
                 side={THREE.DoubleSide}
               />
             </mesh>
@@ -194,15 +205,16 @@ function JerseyBody({ team, activeZone, onZoneClick, showHeatmap }: Omit<JerseyP
                 zoneConfig.pos[2] + (zoneConfig.rotation?.[1] === Math.PI ? -0.01 : 0.01)
               ]}
               rotation={zoneConfig.rotation || [0, 0, 0]}
-              fontSize={0.04}
+              fontSize={0.035}
               color="#FFFFFF"
               anchorX="center"
               anchorY="middle"
-              outlineWidth={0.003}
+              outlineWidth={0.002}
               outlineColor="#000000"
-              font="https://fonts.gstatic.com/s/outfit/v11/QGYvz_MVcBeNP4NjuGObqx1XmO1I4TC1C4G-EiAou6Y.woff2"
+              font="https://fonts.gstatic.com/s/plus-jakarta-sans/v8/L0x9DFM6L-r7u3-fX6e_i0Z0A6Z0.woff2"
+              fontWeight={800}
             >
-              {sponsor.sponsor}
+              {sponsor.sponsor.toUpperCase()}
             </Text>
           </group>
         );
@@ -226,38 +238,34 @@ function AutoRotate({ autoSpin, children }: { autoSpin: boolean; children: React
 
 // Ground platform with neon ring
 function Platform({ color }: { color: string }) {
-  const ringRef = useRef<THREE.Mesh>(null);
-
-  useFrame(({ clock }) => {
-    if (ringRef.current) {
-      const material = ringRef.current.material as THREE.MeshPhysicalMaterial;
-      material.emissiveIntensity = 0.5 + Math.sin(clock.elapsedTime * 2) * 0.3;
-    }
-  });
-
   return (
-    <group position={[0, -0.8, 0]}>
-      {/* Platform disk */}
+    <group position={[0, -0.7, 0]}>
+      {/* Premium Reflective Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <cylinderGeometry args={[1.2, 1.2, 0.05, 64]} />
-        <meshPhysicalMaterial
-          color="#0a0a1a"
-          metalness={0.9}
-          roughness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+        <planeGeometry args={[20, 20]} />
+        <MeshReflectorMaterial
+          blur={[300, 100]}
+          resolution={2048}
+          mixBlur={1}
+          mixStrength={40}
+          roughness={1}
+          depthScale={1.2}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.4}
+          color="#050505"
+          metalness={0.5}
+          mirror={0.5}
         />
       </mesh>
-      {/* Neon ring */}
-      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
-        <torusGeometry args={[1.15, 0.02, 16, 100]} />
-        <meshPhysicalMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.8}
-          transparent
-          opacity={0.9}
-        />
+      
+      {/* Neon Ring Glow */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+        <ringGeometry args={[1.1, 1.2, 64]} />
+        <meshBasicMaterial color={color} transparent opacity={0.3} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+        <ringGeometry args={[1.05, 1.25, 64]} />
+        <meshBasicMaterial color={color} transparent opacity={0.1} />
       </mesh>
     </group>
   );
@@ -272,29 +280,39 @@ export default function Jersey3DViewer({
   showHeatmap,
 }: JerseyProps) {
   return (
-    <div style={{ width: '100%', height: '100%', minHeight: '500px' }}>
+    <div style={{ width: '100%', height: '100%', minHeight: '600px', background: '#000' }}>
       <Canvas
-        camera={{ position: [0, 0.5, 2.5], fov: 45 }}
+        camera={{ position: [0, 0.5, 2.5], fov: 40 }}
         shadows
         dpr={[1, 2]}
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
+        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.5 }}
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow shadow-mapSize={2048} />
-        <directionalLight position={[-5, 3, -5]} intensity={0.4} color="#8B5CF6" />
-        <pointLight position={[0, 3, 0]} intensity={0.8} color={team.neonGlow} />
-        <spotLight position={[0, 5, 2]} angle={0.3} penumbra={0.5} intensity={1} castShadow color="#ffffff" />
+        <color attach="background" args={['#000000']} />
+        
+        {/* Cinematic Studio Lighting */}
+        <ambientLight intensity={0.1} />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} castShadow color={team.primaryColor} />
+        <spotLight position={[-10, 5, 10]} angle={0.2} penumbra={1} intensity={1.5} color="#3B82F6" />
+        <pointLight position={[0, 2, 0]} intensity={1} color={team.neonGlow} />
+        
+        <Environment preset="studio" blur={1} />
+        
+        {/* Soft Shadows */}
+        <ContactShadows 
+          position={[0, -0.7, 0]} 
+          opacity={0.65} 
+          scale={10} 
+          blur={2.5} 
+          far={1} 
+          color="#000000" 
+        />
 
-        {/* Environment for reflections */}
-        <Environment preset="city" />
+        {/* Floating Sparkles */}
+        <Sparkles count={50} scale={4} size={2} speed={0.4} color={team.neonGlow} opacity={0.6} />
 
-        {/* Sparkles around jersey */}
-        <Sparkles count={40} scale={3} size={1.5} speed={0.3} color={team.neonGlow} opacity={0.4} />
-
-        {/* Jersey */}
+        {/* Main Content */}
         <AutoRotate autoSpin={autoSpin}>
-          <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.3}>
+          <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
             <JerseyBody
               team={team}
               activeZone={activeZone}
@@ -304,18 +322,19 @@ export default function Jersey3DViewer({
           </Float>
         </AutoRotate>
 
-        {/* Platform */}
+        {/* Reflective Floor */}
         <Platform color={team.neonGlow} />
 
-        {/* Controls */}
+        {/* Camera Controls */}
         <OrbitControls
           enablePan={false}
-          minDistance={1.5}
-          maxDistance={5}
+          minDistance={1.2}
+          maxDistance={4}
           minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 1.8}
+          maxPolarAngle={Math.PI / 1.9}
           enableDamping
           dampingFactor={0.05}
+          autoRotate={false}
         />
       </Canvas>
     </div>
