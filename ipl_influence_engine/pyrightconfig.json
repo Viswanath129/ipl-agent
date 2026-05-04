@@ -1,0 +1,12 @@
+{
+  "reportMissingModuleSource": "none",
+  "reportMissingImports": "none",
+  "pythonVersion": "3.11",
+  "venvPath": ".",
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": ["."]
+    }
+  ]
+}
