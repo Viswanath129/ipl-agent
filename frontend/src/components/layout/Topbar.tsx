@@ -33,12 +33,12 @@ const Topbar: React.FC = () => {
   };
 
   return (
-    <header className="h-14 bg-[#020617] border-b border-white/10 sticky top-0 z-40 px-6 flex items-center justify-between">
+    <header className="h-14 bg-[#020617] border-b border-white/10 sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
       {/* Left: Page Title */}
-      <h1 className="text-lg font-semibold text-white min-w-[160px]">{pageTitle}</h1>
+      <h1 className="text-lg font-semibold text-white sm:min-w-[160px]">{pageTitle}</h1>
 
       {/* Center: Search */}
-      <form onSubmit={handleSearch} className="flex-1 max-w-[400px] mx-6">
+      <form onSubmit={handleSearch} className="mx-6 hidden max-w-[400px] flex-1 sm:block">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
           <input
@@ -97,7 +97,7 @@ const Topbar: React.FC = () => {
         {/* Upgrade */}
         <button
           onClick={() => toast.info("Upgrade to Pro for unlimited API access.")}
-          className="h-8 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-colors"
+          className="hidden h-8 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-colors sm:block"
         >
           Upgrade
         </button>

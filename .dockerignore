@@ -1,0 +1,15 @@
+# .dockerignore
+.git
+node_modules
+frontend/node_modules
+frontend/dist
+ipl_influence_engine/node_modules
+ipl_influence_engine/__pycache__
+ipl_influence_engine/*.db
+ipl_influence_engine/*.sqlite3
+ipl_influence_engine/venv
+ipl_influence_engine/.venv
+.env
+.env.local
+*.log
+.firebase

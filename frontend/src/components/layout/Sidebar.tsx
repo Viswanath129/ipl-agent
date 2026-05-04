@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   return (
     <aside
       className={`sticky top-0 h-screen bg-[#020617] border-r border-white/10 flex flex-col flex-shrink-0 transition-[width] duration-200 z-50 ${
-        isOpen ? 'w-60' : 'w-[72px]'
+        isOpen ? 'w-60 max-md:w-[72px]' : 'w-[72px]'
       }`}
     >
       {/* Logo */}
@@ -42,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           <Zap className="text-white" size={18} />
         </div>
         {isOpen && (
-          <span className="ml-3 text-sm font-semibold text-white tracking-tight">IPL Engine</span>
+          <span className="ml-3 hidden text-sm font-semibold text-white tracking-tight md:inline">IPL Engine</span>
         )}
       </div>
 
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
               } ${!isOpen ? 'justify-center px-2' : ''}`}
             >
               <Icon size={18} className="flex-shrink-0" />
-              {isOpen && <span>{item.name}</span>}
+              {isOpen && <span className="hidden md:inline">{item.name}</span>}
             </NavLink>
           );
         })}
@@ -72,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       {/* Footer */}
       <div className="p-2 border-t border-white/10">
         {isOpen && (
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
+          <div className="mb-1 hidden items-center gap-3 px-3 py-2 md:flex">
             <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-semibold flex-shrink-0">
               AD
             </div>

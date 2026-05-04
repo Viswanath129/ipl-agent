@@ -61,7 +61,7 @@ function JerseyBody({ team, activeZone, onZoneClick, showHeatmap }: Omit<JerseyP
   };
 
   return (
-    <group ref={meshRef}>
+    <group ref={meshRef} scale={0.66} position={[0, 0.42, 0]}>
       {/* Main jersey torso */}
       <mesh castShadow receiveShadow>
         <boxGeometry args={[0.9, 1.2, 0.45]} />
@@ -164,7 +164,6 @@ function JerseyBody({ team, activeZone, onZoneClick, showHeatmap }: Omit<JerseyP
         color={team.textColor}
         anchorX="center"
         anchorY="middle"
-        font="https://fonts.gstatic.com/s/plusjakartasans/v8/L0x9DFM6L-r7u3-fX6e_i0Z0A6Z0.woff2"
         fontWeight={700}
       >
         {team.shortName}
@@ -220,7 +219,6 @@ function JerseyBody({ team, activeZone, onZoneClick, showHeatmap }: Omit<JerseyP
               anchorY="middle"
               outlineWidth={0.003}
               outlineColor="#000000"
-              font="https://fonts.gstatic.com/s/plusjakartasans/v8/L0x9DFM6L-r7u3-fX6e_i0Z0A6Z0.woff2"
             >
               {sponsor.sponsor}
             </Text>
@@ -292,7 +290,7 @@ export default function Jersey3DViewer({
   return (
     <div className="w-full h-full min-h-[600px] relative bg-[#020617]">
       <Canvas
-        camera={{ position: [0, 0.5, 3], fov: 50 }}
+        camera={{ position: [0, 0.45, 5.4], fov: 32 }}
         shadows={false}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
@@ -318,8 +316,8 @@ export default function Jersey3DViewer({
 
           <OrbitControls
             enablePan={false}
-            minDistance={1.5}
-            maxDistance={4.5}
+            minDistance={3}
+            maxDistance={6}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI / 1.8}
             enableDamping
