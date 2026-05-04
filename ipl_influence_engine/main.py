@@ -37,6 +37,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def root():
+    """Root endpoint to verify the API is running."""
+    return {
+        "status": "online",
+        "message": "IPL Influence Engine API is active",
+        "dashboard_url": "https://gdgbzw.web.app",
+        "docs_url": "/docs"
+    }
+
+
 RATE_LIMIT_WINDOW_SECONDS = 60
 RATE_LIMIT_MAX_REQUESTS = 30
 request_log = defaultdict(deque)
