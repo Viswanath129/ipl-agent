@@ -3,7 +3,7 @@ import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import Body, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -106,10 +106,12 @@ def health():
 
 
 @app.post("/chat")
-def chat(req: QueryRequest | None = None):
-    if req is None:
+def chat(payload: dict | None = Body(default=None)):
+    query = payload.get("query") if payload else None
+    if not query:
         return {"response": "working"}
     try:
+        req = QueryRequest(query=query)
         return {"response": handle_query(req.query)}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Unable to process query") from e
@@ -193,11 +195,31 @@ def cache_stats(request: Request, x_api_key: str | None = Header(default=None)):
     return {"success": True, "data": get_cache_stats()}
 
 
+@app.get("/")
+async def serve_frontend():
+    """Serve the frontend index.html."""
+    index_file = os.path.join("./static", "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    raise HTTPException(status_code=404, detail="Frontend not found")
+
 @app.get("/{path_name:path}")
 async def serve_static_asset(path_name: str):
+    """Serve static assets for the frontend."""
+    # If no path is provided or it's a root request, serve index.html
+    if not path_name or path_name == "":
+        return await serve_frontend()
+    
     static_file = os.path.join("./static", path_name)
     if os.path.exists(static_file) and os.path.isfile(static_file):
         return FileResponse(static_file)
+    
+    # For SPA routing, serve index.html for non-existent files
+    if "." not in path_name:
+        index_file = os.path.join("./static", "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+    
     raise HTTPException(status_code=404, detail="Not Found")
 
 
