@@ -81,6 +81,9 @@ def enforce_api_key(x_api_key: str | None) -> None:
 
 @app.get("/")
 def root():
+    index_path = os.path.join("./static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {"status": "IPL Agent Running", "service": "ok"}
 
 
