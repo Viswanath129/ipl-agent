@@ -39,6 +39,8 @@ steps:
       - '0'
       - '--max-instances'
       - '1'
+      - '--set-env-vars'
+      - 'API_KEY=AIzaSyCo_3jymK3meF7ma1mbUP7TiMXv6JqoeUo'
 
 images:
   - 'gcr.io/$PROJECT_ID/ipl-influence-engine'
