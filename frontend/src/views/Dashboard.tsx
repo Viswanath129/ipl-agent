@@ -14,10 +14,13 @@ const kpiData = [
 ];
 
 const sponsorData = [
-  { name: 'Marriott Bonvoy', team: 'MI', value: '₹48Cr', score: 98.4, zone: 'Front chest' },
   { name: 'India Cements', team: 'CSK', value: '₹45Cr', score: 96.8, zone: 'Front chest' },
-  { name: 'Samsung', team: 'MI', value: '₹35Cr', score: 93.2, zone: 'Front center' },
   { name: 'Myntra', team: 'CSK', value: '₹32Cr', score: 89.7, zone: 'Front center' },
+  { name: 'Astral Pipes', team: 'MI', value: '₹20Cr', score: 74.0, zone: 'Right sleeve' },
+  { name: 'Campa Cola', team: 'MI', value: '₹18Cr', score: 71.0, zone: 'Left sleeve' },
+  { name: 'Astroglide', team: 'MI', value: '₹14Cr', score: 52.0, zone: 'Upper back' },
+  { name: 'DBS', team: 'MI', value: '₹9Cr', score: 38.0, zone: 'Lower back' },
+  { name: 'Jio', team: 'MI', value: '₹6Cr', score: 33.0, zone: 'Collar' },
 ];
 
 const Dashboard: React.FC = () => {
