@@ -38,15 +38,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.responses import RedirectResponse
+
 @app.get("/")
 def root():
-    """Root endpoint to verify the API is running."""
-    return {
-        "status": "online",
-        "message": "IPL Influence Engine API is active",
-        "dashboard_url": "https://gdgbzw.web.app",
-        "docs_url": "/docs"
-    }
+    """Redirect to the frontend dashboard."""
+    return RedirectResponse(url="https://gdgbzw.web.app")
 
 
 RATE_LIMIT_WINDOW_SECONDS = 60
