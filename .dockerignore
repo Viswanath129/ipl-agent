@@ -1,15 +1,23 @@
 # .dockerignore
 .git
+.gitignore
 node_modules
-frontend/node_modules
-frontend/dist
+frontend
+functions
+deploy_cheap.bat
+CHEAP_DEPLOY.md
+README.md
 ipl_influence_engine/node_modules
 ipl_influence_engine/__pycache__
 ipl_influence_engine/*.db
 ipl_influence_engine/*.sqlite3
 ipl_influence_engine/venv
 ipl_influence_engine/.venv
+ipl_influence_engine/.pytest_cache
+ipl_influence_engine/.streamlit
 .env
 .env.local
 *.log
 .firebase
+.DS_Store
+Thumbs.db
