@@ -1,1 +1,1 @@
-# adk package init
+# Google ADK Shim sub-package

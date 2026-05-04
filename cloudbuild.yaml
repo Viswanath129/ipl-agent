@@ -41,7 +41,7 @@ steps:
       - '--max-instances'
       - '1'
       - '--set-env-vars'
-      - 'API_KEY=AIzaSyCPAFtyah0VpLGCmhr87jQLSxO-6A1A0hw'
+      - 'API_KEY=AIzaSyCPAFtyah0VpLGCmhr87jQLSxO-6A1A0hw,GEMINI_API_KEY=AIzaSyCPAFtyah0VpLGCmhr87jQLSxO-6A1A0hw'
 
 images:
   - 'gcr.io/$PROJECT_ID/ipl-influence-engine'

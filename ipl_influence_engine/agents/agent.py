@@ -7,10 +7,20 @@ from tools.sponsor_tools import (
     sponsor_roi_tool,
 )
 
+import sys
+import os
+
+# Add current directory to path to find our local google shim
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 try:
     from google.adk.agents import Agent
 except ImportError:
-    Agent = None
+    # Fallback to absolute import if needed
+    try:
+        from ipl_influence_engine.google.adk.agents import Agent
+    except ImportError:
+        Agent = None
 
 
 root_agent = (

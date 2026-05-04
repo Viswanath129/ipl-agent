@@ -1,5 +1,6 @@
 from agents.module_a_sponsor_roi import run_sponsor_agent
 from agents.module_b_debate import run_debate_agent
+from agents.agent import root_agent
 from data.database import log_query
 from utils.cache import cache_response, get_cached_response
 
@@ -38,15 +39,29 @@ def handle_query(query: str, skip_cache: bool = False) -> dict:
 
     result = {"route_taken": route, "query": query, "cached": False}
 
-    if route == "sponsor":
-        result["module_a_output"] = run_sponsor_agent(query)
-    elif route == "debate":
-        result["module_b_output"] = run_debate_agent(query)
-    elif route == "mixed":
-        result["module_a_output"] = run_sponsor_agent(query)
-        result["module_b_output"] = run_debate_agent(query)
+    # Use Gemini-powered Agent if available
+    if root_agent:
+        agent_response = root_agent.run(query)
+        # If it returns a string, put it in the message
+        if isinstance(agent_response, str):
+            result["message"] = agent_response
+            # Try to populate modules if the agent called them (optional polish)
+            if "ROI" in agent_response:
+                result["module_a_output"] = run_sponsor_agent(query)
+            if "Debate" in agent_response or "vs" in query.lower():
+                result["module_b_output"] = run_debate_agent(query)
+        else:
+            result.update(agent_response)
     else:
-        result["message"] = "Ask about IPL sponsor ROI, brand visibility, or player/team debates."
+        if route == "sponsor":
+            result["module_a_output"] = run_sponsor_agent(query)
+        elif route == "debate":
+            result["module_b_output"] = run_debate_agent(query)
+        elif route == "mixed":
+            result["module_a_output"] = run_sponsor_agent(query)
+            result["module_b_output"] = run_debate_agent(query)
+        else:
+            result["message"] = "Ask about IPL sponsor ROI, brand visibility, or player/team debates."
 
     # Cache the result (cost optimization)
     cache_response(query, route, result)

@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from data.database import save_debate, update_vote
+from agents.agent import root_agent
+import json
 
 
 @dataclass(frozen=True)
@@ -151,6 +153,55 @@ def generate_counterarguments(entity_a: str, entity_b: str, lens: str) -> dict:
 
 
 def judge_debate(topic: str) -> dict:
+    if root_agent:
+        try:
+            # Ask Gemini to judge the debate using available tools
+            prompt = f"Judge this IPL debate topic: {topic}. Provide a JSON response with fields: verdict (detailed explanation), winner (entity name or 'tie'), confidence_pct (int), side_a, side_b."
+            response = root_agent.run(prompt)
+            # If the response is a JSON string, parse it
+            if "{" in response:
+                try:
+                    # Crude extraction of JSON if wrapped in markdown
+                    json_str = response
+                    if "```json" in response:
+                        json_str = response.split("```json")[1].split("```")[0].strip()
+                    elif "```" in response:
+                        json_str = response.split("```")[1].split("```")[0].strip()
+                    
+                    ai_data = json.loads(json_str)
+                    entities = [ai_data.get("side_a", ""), ai_data.get("side_b", "")]
+                    if not entities[0]: entities = extract_entities(topic)
+                except:
+                    entities = extract_entities(topic)
+                    ai_data = {"verdict": response, "winner": "tie", "confidence_pct": 80}
+            else:
+                entities = extract_entities(topic)
+                ai_data = {"verdict": response, "winner": "tie", "confidence_pct": 80}
+            
+            debate_uuid = str(uuid.uuid4())
+            debate_id = f"debate-{debate_uuid[:8]}"
+            save_debate(debate_id, topic, ai_data.get("verdict", ""), ai_data.get("confidence_pct", 80), "low")
+            
+            result = {
+                "debate_id": debate_id,
+                "topic": topic,
+                "lens": "ai_analyzed",
+                "side_a": entities[0] if len(entities) > 0 else "Player A",
+                "side_b": entities[1] if len(entities) > 1 else "Player B",
+                "stats_retrieval": {
+                    entities[0]: retrieve_stats(entities[0]) if len(entities) > 0 else {},
+                    entities[1]: retrieve_stats(entities[1]) if len(entities) > 1 else {},
+                },
+                "final_judge": ai_data,
+                "viral_shareable": build_viral_shareable(topic, ai_data.get("winner", "tie"), ai_data.get("confidence_pct", 80)),
+                "created_at": datetime.now(timezone.utc).isoformat() + "Z",
+                "data_status": "ai_generated",
+            }
+            DEBATE_HISTORY.append(result)
+            return result
+        except Exception as e:
+            print(f"Gemini Debate Error: {e}")
+
     entities = extract_entities(topic)
     if len(entities) < 2:
         entities = ["Dhoni", "Rohit"] if "captain" in topic.lower() else ["Kohli", "ABD"]
