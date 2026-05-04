@@ -1,6 +1,6 @@
 import type { ApiPayload } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://ipl-agent-1009309757911.us-central1.run.app'; 
+const API_BASE = import.meta.env.VITE_API_URL || ''; 
 
 export const apiClient = {
   async post<T>(endpoint: string, data: ApiPayload): Promise<T> {

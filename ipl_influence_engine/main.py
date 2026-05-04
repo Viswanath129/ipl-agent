@@ -38,12 +38,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+# Serve API docs separately if needed
+# Serve static files from the 'static' directory
+if os.path.exists("./static"):
+    app.mount("/assets", StaticFiles(directory="./static/assets"), name="assets")
 
 @app.get("/")
-def root():
-    """Redirect to the frontend dashboard."""
-    return RedirectResponse(url="https://gdgbzw.web.app")
+@app.get("/{path_name:path}")
+async def serve_spa(request: Request, path_name: str = ""):
+    """Serve the React SPA for all non-API routes."""
+    # If the path starts with /api or /health, don't serve the SPA
+    if path_name.startswith("api") or path_name.startswith("health") or path_name.startswith("docs") or path_name.startswith("openapi.json"):
+        raise HTTPException(status_code=404)
+        
+    static_file = os.path.join("./static", path_name)
+    if os.path.exists(static_file) and os.path.isfile(static_file):
+        return FileResponse(static_file)
+        
+    # Default to index.html for SPA routing
+    index_path = os.path.join("./static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    
+    return {"message": "API is running, but static assets are not found. Build the frontend first."}
+
 
 
 RATE_LIMIT_WINDOW_SECONDS = 60
