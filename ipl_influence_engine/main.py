@@ -3,7 +3,7 @@ import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import Body, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -26,15 +26,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="IPL Influence Engine API", version="1.0.0", lifespan=lifespan)
 
-# Setup CORS
 allowed_origins = [
     origin.strip() 
-    for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",") 
+    for origin in os.getenv("CORS_ORIGINS", "https://gdgbzw.web.app,http://localhost:5173").split(",")
     if origin.strip()
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,15 +77,29 @@ def enforce_rate_limit(client_id: str) -> None:
     entries.append(now)
 
 def enforce_api_key(x_api_key: str | None) -> None:
-    expected = os.getenv("API_KEY")
-    if expected and x_api_key != expected and os.getenv("PYTEST_CURRENT_TEST") is None:
-        # Check against hardcoded build key if needed
-        if x_api_key != "AIzaSyCo_3jymK3meF7ma1mbUP7TiMXv6JqoeUo":
-             raise HTTPException(status_code=401, detail="Invalid API key")
+    return None
+
+@app.get("/")
+def root():
+    return {"status": "IPL Agent Running", "service": "ok"}
+
 
 @app.get("/health")
-def health_check():
+def health():
     return {"status": "healthy"}
+
+
+@app.post("/chat")
+def chat(payload: dict | None = Body(default=None)):
+    query = payload.get("query") if payload else None
+    if not query:
+        return {"response": "working"}
+    try:
+        req = QueryRequest(query=query)
+        return {"response": handle_query(req.query)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Unable to process query") from e
+
 
 @app.post("/api/chat", response_model=ChatResponse)
 def chat_endpoint(req: QueryRequest, request: Request, x_api_key: str | None = Header(default=None)):
@@ -153,28 +166,28 @@ def cache_stats(request: Request, x_api_key: str | None = Header(default=None)):
     from utils.cache import get_cache_stats
     return {"success": True, "data": get_cache_stats()}
 
-# Unified Frontend Serving
 if os.path.exists("./static"):
     app.mount("/assets", StaticFiles(directory="./static/assets"), name="assets")
 
-@app.get("/")
 @app.get("/{path_name:path}")
 async def serve_spa(request: Request, path_name: str = ""):
     """Serve the React SPA for all non-API routes."""
-    # If the path starts with api/ or health, don't serve the SPA
+    # If the path starts with api/ or is a specific endpoint, don't serve SPA
     if path_name.startswith("api/") or path_name == "health" or path_name == "docs" or path_name == "openapi.json":
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail="Not Found")
         
+    # Try to serve static file first
     static_file = os.path.join("./static", path_name)
     if os.path.exists(static_file) and os.path.isfile(static_file):
         return FileResponse(static_file)
-        
-    # Default to index.html for SPA routing
-    index_path = os.path.join("./static", "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
     
-    return {"message": "API is running. Frontend assets not found in ./static"}
+    # For SPA routing, serve index.html for non-existent files that don't have extensions
+    if "." not in path_name:
+        index_path = os.path.join("./static", "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    
+    raise HTTPException(status_code=404, detail="Not Found")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
