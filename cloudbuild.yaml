@@ -1,6 +1,7 @@
 # Google Cloud Build configuration
 # This file is placed in the root to ensure GitHub triggers can find it.
 # It builds the backend from the ipl_influence_engine directory.
+# Updated to fix deployment issues
 
 steps:
   # 1. Build the Docker image for the backend
