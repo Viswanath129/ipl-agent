@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from agents.orchestrator import handle_query
 from data.database import get_report_summary, init_db
@@ -27,43 +29,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="IPL Influence Engine API", version="1.0.0", lifespan=lifespan)
 allowed_origins = [
     origin.strip() 
-    for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,https://gdgbzw.web.app").split(",") 
+    for origin in os.getenv("CORS_ORIGINS", "https://gdgbzw.web.app,http://localhost:5173").split(",")
     if origin.strip()
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-
-# Serve API docs separately if needed
-# Serve static files from the 'static' directory
 if os.path.exists("./static"):
     app.mount("/assets", StaticFiles(directory="./static/assets"), name="assets")
-
-@app.get("/")
-@app.get("/{path_name:path}")
-async def serve_spa(request: Request, path_name: str = ""):
-    """Serve the React SPA for all non-API routes."""
-    # If the path starts with /api or /health, don't serve the SPA
-    if path_name.startswith("api") or path_name.startswith("health") or path_name.startswith("docs") or path_name.startswith("openapi.json"):
-        raise HTTPException(status_code=404)
-        
-    static_file = os.path.join("./static", path_name)
-    if os.path.exists(static_file) and os.path.isfile(static_file):
-        return FileResponse(static_file)
-        
-    # Default to index.html for SPA routing
-    index_path = os.path.join("./static", "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    
-    return {"message": "API is running, but static assets are not found. Build the frontend first."}
 
 
 
@@ -117,6 +95,26 @@ def enforce_api_key(x_api_key: str | None) -> None:
     #     raise HTTPException(status_code=401, detail="Invalid API key")
 
 
+@app.get("/")
+def root():
+    return {"status": "IPL Agent Running", "service": "ok"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
+
+
+@app.post("/chat")
+def chat(req: QueryRequest | None = None):
+    if req is None:
+        return {"response": "working"}
+    try:
+        return {"response": handle_query(req.query)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Unable to process query") from e
+
+
 @app.post("/api/chat", response_model=ChatResponse)
 def chat_endpoint(req: QueryRequest, request: Request, x_api_key: str | None = Header(default=None)):
     enforce_api_key(x_api_key)
@@ -127,10 +125,6 @@ def chat_endpoint(req: QueryRequest, request: Request, x_api_key: str | None = H
         return {"success": True, "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Unable to process query") from e
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
 
 
 @app.get("/api/reports/summary")
@@ -199,5 +193,14 @@ def cache_stats(request: Request, x_api_key: str | None = Header(default=None)):
     return {"success": True, "data": get_cache_stats()}
 
 
+@app.get("/{path_name:path}")
+async def serve_static_asset(path_name: str):
+    static_file = os.path.join("./static", path_name)
+    if os.path.exists(static_file) and os.path.isfile(static_file):
+        return FileResponse(static_file)
+    raise HTTPException(status_code=404, detail="Not Found")
+
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)

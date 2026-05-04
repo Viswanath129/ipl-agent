@@ -14,18 +14,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Cloud Run uses PORT env var (defaults to 8080)
+# Cloud Run provides PORT at runtime.
 ENV PORT=8080
 
-# Make start script executable
-RUN chmod +x start.sh
-
-# Expose the Cloud Run port (Streamlit) and internal API port
+# Expose the Cloud Run port.
 EXPOSE ${PORT}
-EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3).read()" || exit 1
+    CMD python -c "import os, urllib.request; port = os.environ.get('PORT', '8080'); urllib.request.urlopen(f'http://localhost:{port}/health', timeout=3).read()" || exit 1
 
-CMD ["./start.sh"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]

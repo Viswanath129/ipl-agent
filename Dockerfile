@@ -28,12 +28,9 @@ COPY ipl_influence_engine/ .
 # They will be served by FastAPI
 COPY --from=frontend-builder /app/frontend/dist ./static
 
-# Ensure the startup script is executable
-RUN chmod +x start.sh
-
-# Cloud Run uses PORT environment variable (defaults to 8080)
+# Cloud Run provides PORT at runtime.
 ENV PORT=8080
 EXPOSE ${PORT}
 
-# Run the application
-CMD ["./start.sh"]
+# Run the application on the Cloud Run port.
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]

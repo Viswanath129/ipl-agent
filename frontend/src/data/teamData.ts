@@ -63,12 +63,11 @@ export const teams: TeamData[] = [
     textColor: '#FFFFFF',
     gradient: ['#004BA0', '#0D47A1'],
     neonGlow: '#2196F3',
-    totalSponsorValue: '₹172 Cr',
+    totalSponsorValue: '₹124 Cr',
     brandScore: 98,
     frontImage: '/assets/jerseys/mi/front.png',
     backImage: '/assets/jerseys/mi/back.png',
     sponsors: [
-      { zone: 'front_chest', label: 'Front Chest', sponsor: 'Marriott Bonvoy', visibility_score: 96, estimated_value: '₹48 Cr', camera_exposure: 'very high', fan_recall: 'strong', color: '#D4AF37' },
       { zone: 'front_center', label: 'Front Center', sponsor: 'Samsung', visibility_score: 90, estimated_value: '₹35 Cr', camera_exposure: 'high', fan_recall: 'strong', color: '#1428A0' },
       { zone: 'right_sleeve', label: 'Right Sleeve', sponsor: 'Astral Pipes', visibility_score: 74, estimated_value: '₹20 Cr', camera_exposure: 'medium', fan_recall: 'moderate', color: '#FF5722' },
       { zone: 'left_sleeve', label: 'Left Sleeve', sponsor: 'Campa Cola', visibility_score: 71, estimated_value: '₹18 Cr', camera_exposure: 'medium', fan_recall: 'moderate', color: '#E91E63' },
@@ -321,7 +320,7 @@ export const matchPhases: MatchPhase[] = [
 export const getTeamByBrand = (brandName: string): TeamData | undefined => {
   const brand = brandName.toLowerCase();
   if (brand.includes('india cements') || brand.includes('csk') || brand.includes('amrutanjan') || brand.includes('tvs') || brand.includes('gulf')) return teams.find(t => t.id === 'csk');
-  if (brand.includes('marriott') || brand.includes('mi') || brand.includes('samsung') || brand.includes('astral') || brand.includes('jio')) return teams.find(t => t.id === 'mi');
+  if (brand.includes('mi') || brand.includes('samsung') || brand.includes('astral') || brand.includes('jio')) return teams.find(t => t.id === 'mi');
   if (brand.includes('muthoot') || brand.includes('rcb') || brand.includes('puma') || brand.includes('kingfisher') || brand.includes('cred')) return teams.find(t => t.id === 'rcb');
   if (brand.includes('lux') || brand.includes('kkr') || brand.includes('my11circle') || brand.includes('noise')) return teams.find(t => t.id === 'kkr');
   if (brand.includes('jk lakshmi') || brand.includes('srh') || brand.includes('adidas')) return teams.find(t => t.id === 'srh');

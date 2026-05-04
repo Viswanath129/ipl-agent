@@ -2,11 +2,12 @@
 .git
 .gitignore
 node_modules
-frontend
 functions
 deploy_cheap.bat
 CHEAP_DEPLOY.md
 README.md
+frontend/node_modules
+frontend/dist
 ipl_influence_engine/node_modules
 ipl_influence_engine/__pycache__
 ipl_influence_engine/*.db
